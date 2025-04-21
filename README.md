@@ -65,12 +65,12 @@ Result: SMOTE proved the best option. Test Results (F1): SMOTE = 0.6972, ADASYN 
 * XGBOOST EnhancementS: Used RandomizedSearchCV for hyperparameter tuning (e.g., max_depth, learning_rate).
 * Feature Selection: Retained features contributing > 90% of importance, identified via initial XGBoost training.
 
-# 3.6 [Evaluation Metrics] (#3.6)
+# 3.6 [Evaluation Metrics](#3.6)
 Added ROC-AUC, precision recall curve and average precisions score.
 Adjusted decision thresholds for F1-score and cost-based performance. 
 
-# 4 [Results and Discussion] (#4)
-# 4.1[Initial Model] (#4.1)
+# 4 [Results and Discussion](#4)
+# 4.1[Initial Model](#4.1)
   High accuracy (99%) and good recall (99% of non fraud cases identified, 93% of fraud cases)  also its precision for fraudulent transactions was only 4%.
   Furthermore F1 scores for non fraud cases was 99% showing the model was highly effective at identifying the most common class.
   However, F1 scores for fraud cases was only 8% which is due to the issue of mislabeling most fraud cases.
@@ -87,5 +87,5 @@ Adjusted decision thresholds for F1-score and cost-based performance.
 * Resampling mitigated imbalance, boosting minority class detection.
 * Tuning refined model precision without sacrificing recall.
 
-# 5 [Conclusion] (#5)
+# 5 [Conclusion](#5)
 The evolution from the initial to the enhanced fraud detection model demonstrates the power of iterative improvement in machine learning. The enhanced approach, with its sophisticated feature engineering, robust preprocessing, and optimized XGBoost model, significantly outperforms the baseline, offering a practical solution for financial fraud detection. Future work could explore ensemble methods or deep learning to further enhance performance.
