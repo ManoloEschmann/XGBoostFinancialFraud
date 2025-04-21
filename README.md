@@ -70,7 +70,7 @@ Added ROC-AUC, precision recall curve and average precisions score.
 Adjusted decision thresholds for F1-score and cost-based performance. 
 
 # 4 [Results and Discussion](#4)
-# 4.1[Initial Model](#4.1)
+# 4.1 [Initial Model](#4.1)
   High accuracy (99%) and good recall (99% of non fraud cases identified, 93% of fraud cases)  also its precision for fraudulent transactions was only 4%.
   Furthermore F1 scores for non fraud cases was 99% showing the model was highly effective at identifying the most common class.
   However, F1 scores for fraud cases was only 8% which is due to the issue of mislabeling most fraud cases.
@@ -78,7 +78,7 @@ Adjusted decision thresholds for F1-score and cost-based performance.
   From a business perspective the problem with the precision of 4% for fraudulent transactions means that out of every 100 transactions flagged as suspicious, it only had 4 correct (96 false alarms)
   This would cause large labour costs as employees would have to skim through these transactions seperately. 
 
-# 4.2[Enhanced Model](#4.2)
+# 4.2 [Enhanced Model](#4.2)
    Perfect accuracy (100%) , also the precision for non fraud cases is now 96% meaning only 4 out of 100 fraudulent transactions were mislabeled. 
    The F1 scores for non fraudulent cases was 100% and 95% for fraudulent cases. This is a drastic improvement over the previous model. 
 
