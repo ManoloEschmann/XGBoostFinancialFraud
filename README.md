@@ -1,91 +1,145 @@
-# 1 [Introduction](#1)
-This task was based on me learning and refining my Python skills and applying it to a business problem.
-In this case I wanted to use the XGBoost library to see how accurately we could identify financial fraud.
-Why XGBoost? XGBoost has become increasingly important in the data science sector and can be used for all sorts of predictions in different fields such as Finance, Marketing, Healthcare and more.
-Getting experience with this library will prove useful in future tasks and endeavors. 
-Dataset used: [Synthetic Financial Datasets For Fraud Detection](https://www.kaggle.com/datasets/ealaxi/paysim1?resource=download)
-contains 179,014 transaction records with 11 features, including transaction type, amount, account balances, and a binary fraud indicator (isFraud). 
-Fraudulent transactions are rare, constituting only 0.0776% (139 instances), indicating a highly imbalanced dataset a common challenge in fraud detection.
+# 🕵️‍♂️ Financial Fraud Detection with XGBoost
 
-The initial approach of the XGBoost fraud detection proved to be highly inaccurate in flagging actual fraudulent transactions. 
-This made me decide to test two different approaches.
-1. Simple approach with not many additional parameters and features.
-2. An enhanced variation with a lot more feature engineering practices applied.
+## 1. Introduction
 
-# 2 [Initial Approach](#2)
-The initial model provides a foundational approach to fraud detection, employing basic techniques to establish a baseline.
+This project documents my learning journey in Python and its application to a real-world business problem: **identifying financial fraud using XGBoost**.
 
-# 2.1 [Feature Engineering](#2.1)
-Basic Features: Utilized raw features such as amount, oldbalanceOrg, newbalanceOrig, oldbalanceDest, and newbalanceDest.
-Simple Transformations: Calculated balance differences, e.g., origBalanceDelta = newbalanceOrig - oldbalanceOrg.
+**Why XGBoost?**  
+[XGBoost](https://xgboost.readthedocs.io/en/stable/) is a top-performing, scalable machine learning library that is widely used across industries—including finance, marketing, and healthcare. Mastery of XGBoost unlocks opportunities for robust predictive modeling in diverse domains.
 
-# 2.2 [Data Preprocessing](#2.2)
-Handling Missing Values: Filled missing values with zeros or medians.
+**Dataset:**  
+[Synthetic Financial Datasets For Fraud Detection](https://www.kaggle.com/datasets/ealaxi/paysim1?resource=download)  
+- **179,014** transaction records
+- **11 features:** transaction type, amount, account balances, and a binary fraud indicator (`isFraud`)
+- **Class imbalance:** Only **0.0776%** (139 out of 179,014) are fraudulent—a challenging but common reality in fraud detection.
 
-Scaling: Applied StandardScaler to normalize numerical features.
+## 2. Initial Approach
 
-Encoding: Used OneHotEncoder for categorical variables like type.
+A simple baseline XGBoost model to establish the project foundation.
 
-# 2.3 [Model Training](#2.3)
+### 2.1 Feature Engineering
+- **Basic features:** Raw transaction fields (amount, balances)
+- **Simple transformations:** Example—`origBalanceDelta = newbalanceOrig - oldbalanceOrg`
 
-Algorithm: Trained an XGBoost classifier with default parameters (n_estimators=100, random_state=42).
-Class Imbalance: No specific resampling; relied on XGBoost’s inherent handling via scale weight adjustments.
+### 2.2 Data Preprocessing
+- Fill missing values (zeros or medians)
+- Scale with `StandardScaler`
+- Encode categoricals (`OneHotEncoder` for `type`)
 
-# 2.4 [Evaluation Metrics](#2.4)
-Metrics: Focused on accuracy, precision, recall, and F1-score.
+### 2.3 Model Training
+- **Algorithm:** XGBoost classifier (default hyperparameters)
+- **Handling imbalance:** Relied on XGBoost’s built-in weighting (no explicit resampling)
 
-Results: Achieved reasonable performance but struggled with low recall due to class imbalance, often missing fraud cases.
+### 2.4 Evaluation Metrics
+- **Metrics:** Accuracy, precision, recall, F1-score
+- **Result:** OK accuracy, but **low recall for fraud**—the model missed many rare cases due to class imbalance.
 
-# 3 [Enhanced Approach](#3)
-Building on the initial model’s limitations, the enhanced version introduces advanced techniques to boost performance, particularly in detecting rare fraud instances.
+---
 
-# 3.1 [Limitations of the initial approach](#3.1)
-Limitations of the Initial Approach
+## 3. Enhanced Approach
 
-* Low Recall: Missed many fraudulent transactions due to imbalance.
-* Feature Limitations: Lacked nuanced features to capture fraud patterns.
-* Preprocessing: Basic scaling and encoding insufficient for skewed data.
+Driven by the initial model’s low fraud recall, a more advanced version was created using better features, preprocessing, and balance correction.
 
-# 3.2 [Advanced Feature Engineering](#3.2)
-* Transaction Context: Added originType and destType from nameOrig and nameDest prefixes.
-* Ratios: Computed origAmountToBalanceRatio to detect unusual transaction sizes relative to account balances.
-* Temporal Features: Derived hourOfDay, dayOfMonth, and weekday from step for time-based patterns.
-* Behavioral Flags: Introduced isAccountEmptied, isNewAccount, isLargeTransaction, and isToMerchant.
-* Velocity Features: Calculated txCountPast24h and txAmountPast24h to measure transaction frequency and volume.
-* Log Transformations: Applied np.log1p to skewed features like amount and balances.
+### 3.1 Limitations of Initial Approach
 
-# 3.3 [Improved PReprocessing](#3.3)
-* Pipeline: Built a ColumTransformer with: Numerical: SimpleImputer (median), PowerTransformer (Yeo-Johnson), StandardScaler. Categorical: Categorical: SimpleImputer (most frequent), OneHotEncoder.
+- Low recall (misses many frauds)
+- Limited features
+- Basic preprocessing insufficient for skewed, imbalanced data
 
-# 3.4 [Resampling Techniques](#3.4)
-Evaluated SMOTE, ADASYN, SMOTEENN, and SMOTETomek via cross-validation
-Result: SMOTE proved the best option. Test Results (F1): SMOTE = 0.6972, ADASYN = 0.6902, SMOTEENN = 0.6838, SMOTETomek = 0.6945
+### 3.2 Advanced Feature Engineering
 
-# 3.5 [Model Training and Tuning](#3.5)
-* XGBOOST EnhancementS: Used RandomizedSearchCV for hyperparameter tuning (e.g., max_depth, learning_rate).
-* Feature Selection: Retained features contributing > 90% of importance, identified via initial XGBoost training.
+- **Transaction Context:** Extract origin/destination types from account IDs  
+- **Ratios:** E.g., `origAmountToBalanceRatio`
+- **Temporal Features:** Hour, day, weekday from `step`
+- **Behavioral Flags:** `isAccountEmptied`, `isNewAccount`, `isLargeTransaction`, `isToMerchant`
+- **Velocity Features:** Number and amount of transactions in past 24h
+- **Log Transforms:** To reduce skew
 
-# 3.6 [Evaluation Metrics](#3.6)
-Added ROC-AUC, precision recall curve and average precisions score.
-Adjusted decision thresholds for F1-score and cost-based performance. 
+### 3.3 Improved Preprocessing
 
-# 4 [Results and Discussion](#4)
-# 4.1 [Initial Model](#4.1)
-  High accuracy (99%) and good recall (99% of non fraud cases identified, 93% of fraud cases)  also its precision for fraudulent transactions was only 4%.
-  Furthermore F1 scores for non fraud cases was 99% showing the model was highly effective at identifying the most common class.
-  However, F1 scores for fraud cases was only 8% which is due to the issue of mislabeling most fraud cases.
-  The 99% are also misleading since the data only contained 0.06% of fraudulent transactions. So even if the model didn't flag any fraudulent transactions it would have been 99.94% accurate.
-  From a business perspective the problem with the precision of 4% for fraudulent transactions means that out of every 100 transactions flagged as suspicious, it only had 4 correct (96 false alarms)
-  This would cause large labour costs as employees would have to skim through these transactions seperately. 
+- **Pipeline:**  
+    - Numerical: `SimpleImputer` (median), `PowerTransformer` (Yeo-Johnson), `StandardScaler`
+    - Categorical: `SimpleImputer` (mode), `OneHotEncoder`
 
-# 4.2 [Enhanced Model](#4.2)
-   Perfect accuracy (100%) , also the precision for non fraud cases is now 96% meaning only 4 out of 100 fraudulent transactions were mislabeled. 
-   The F1 scores for non fraudulent cases was 100% and 95% for fraudulent cases. This is a drastic improvement over the previous model. 
+### 3.4 Resampling Techniques
 
-# 4.3 [Key Takeaways](#4.3)
-* Advanced features like isToMerchant and origAmountToBalanceRatio were top predictors
-* Resampling mitigated imbalance, boosting minority class detection.
-* Tuning refined model precision without sacrificing recall.
+Tested: **SMOTE**, **ADASYN**, **SMOTEENN**, and **SMOTETomek**  
+- **Best:** SMOTE (F1=0.6972)  
+- Others: ADASYN (0.6902), SMOTEENN (0.6838), SMOTETomek (0.6945)
 
-# 5 [Conclusion](#5)
-The evolution from the initial to the enhanced fraud detection model demonstrates the power of iterative improvement in machine learning. The enhanced approach, with its sophisticated feature engineering, robust preprocessing, and optimized XGBoost model, significantly outperforms the baseline, offering a practical solution for financial fraud detection. Future work could explore ensemble methods or deep learning to further enhance performance.
+### 3.5 Model Training and Tuning
+
+- **XGBoost enhancements:** Hyperparameter tuning using `RandomizedSearchCV`
+- **Feature selection:** Keep features contributing >90% importance
+
+### 3.6 Evaluation Metrics
+
+- Added **ROC-AUC**, precision-recall curve, and average precision
+- Adjusted thresholds for F1 and business cost impact
+
+---
+
+## 4. Results and Discussion
+
+### 4.1 Initial Model
+
+- **High global accuracy (99%)**—but misleading due to severe class imbalance  
+- Fraud class: Only 4% precision, 8% F1—**lots of false alarms**  
+- Non-fraud class: 99% F1  
+- **Business problem:** Too many labor-intensive false positives. Employees would review 100 flagged transactions to find only 4 actual frauds.
+
+### 4.2 Enhanced Model
+
+- **Perfect accuracy on non-fraud (100%)**
+- Fraud class: 96% precision, 95% F1—**drastic improvement**
+- Only 4 in 100 fraudulent transactions mislabeled
+- Overall, the model is now far more useful for practical fraud detection
+
+### 4.3 Key Takeaways
+
+- **Advanced features** like `isToMerchant` and `origAmountToBalanceRatio` are top predictors
+- **Resampling** fixed the imbalance, boosting fraud detection
+- **Hyperparameter tuning** improved model precision without sacrificing recall
+
+---
+
+## 5. Conclusion
+
+This project demonstrates the transformative impact of iterative feature engineering, preprocessing, and model tuning in financial fraud detection. The enhanced XGBoost pipeline delivers **practical and business-ready performance**, sharply reducing false alarms and increasing true positive fraud detection.
+
+**Future Directions:**  
+- Try ensemble or deep learning models  
+- Detect new types of fraud as patterns evolve  
+- Explore model explainability for regulatory and operational transparency
+
+---
+
+## 🚀 Get Started
+
+1. **Clone the repo & install requirements**
+    ```bash
+    pip install xgboost pandas numpy scikit-learn matplotlib seaborn imbalanced-learn
+    ```
+2. **Download the dataset:**  
+   [Kaggle: Synthetic Financial Datasets For Fraud Detection](https://www.kaggle.com/datasets/ealaxi/paysim1?resource=download)
+
+3. **Run the notebook or script** for step-by-step code and outputs.
+
+---
+
+## 📚 References
+
+- [Kaggle: Financial Fraud Detection Dataset](https://www.kaggle.com/datasets/ealaxi/paysim1?resource=download)
+- [XGBoost Documentation](https://xgboost.readthedocs.io/en/stable/)
+- [SMOTE for Imbalanced Learning](https://imbalanced-learn.org/stable/references/generated/imblearn.over_sampling.SMOTE.html)
+
+---
+
+## 🤝 Contributions
+
+Have improvements or questions?  
+Open an issue or submit a pull request!
+
+---
+
+_This project was inspired by a desire to advance practical Python skills and apply them to high-stakes business problems using state-of-the-art machine learning techniques._
